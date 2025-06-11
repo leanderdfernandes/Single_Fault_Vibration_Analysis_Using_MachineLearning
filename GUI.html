@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Vibration Monitor - Predictive Maintenance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; 
+            background-color: #f5f5f7; 
+            color: #1d1d1f; 
+            line-height: 1.5; 
+            overflow-x: hidden; 
+        }
+        p, ul { text-align: justify; }
+        header { 
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)), url('header.png') no-repeat center center; 
+            background-size: cover; 
+            min-height: 180px; 
+            color: #fff; 
+            padding: 60px 20px 70px; 
+            text-align: center; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        header h1 { 
+            font-size: 72px; 
+            font-weight: 600; 
+            letter-spacing: -0.03em; 
+            margin-bottom: 15px; 
+        }
+        header p { 
+            font-size: 24px; 
+            font-weight: 300; 
+            opacity: 0.9; 
+            max-width: 800px; 
+            margin: 0; 
+        }
+        .logo { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            transition: transform 0.3s ease; 
+        }
+        .logo:hover { transform: scale(1.05); }
+        nav { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px); 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            padding: 15px 0; 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
+        }
+        nav a { 
+            text-decoration: none; 
+            color: #1d1d1f; 
+            font-size: 16px; 
+            font-weight: 500; 
+            padding: 8px 16px; 
+            transition: color 0.3s ease; 
+        }
+        nav a:hover { color: #007aff; }
+        .section { 
+            max-width: 1100px; 
+            margin: 40px auto; /* Space between tiles */
+            padding: 80px 20px; 
+            text-align: center; 
+            opacity: 0; 
+            transform: translateY(20px); 
+            animation: fadeIn 0.6s ease-out forwards; 
+            background: #fff; 
+            border-radius: 16px; 
+        }
+        #project-intro { margin-top: 40px; } /* Gap between nav and first section */
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        .section h2 { 
+            font-size: 40px; 
+            font-weight: 600; 
+            margin-bottom: 20px; 
+            color: #1d1d1f; 
+        }
+        .section p { 
+            font-size: 18px; 
+            color: #6e6e73; 
+            max-width: 800px; 
+            margin: 0 auto 40px; 
+        }
+        #project-intro { position: relative; }
+        #creator .bio { max-width: 600px; margin: 0 auto; text-align: left; }
+        #creator .bio h3 { 
+            font-size: 24px; 
+            font-weight: 600; 
+            color: #1d1d1f; 
+            margin-bottom: 20px; 
+            text-align: left; 
+        }
+        #creator ul { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            font-size: 17px; 
+            color: #6e6e73; 
+            list-style: none; 
+            text-align: left; 
+        }
+        #creator ul li { margin-bottom: 10px; }
+        #creator ul li::before { content: "• "; color: #007aff; }
+        #creator .creator-img { 
+            width: 500px; 
+            height: auto; 
+            /* border-radius: 50%;  */
+            margin: 30px auto; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            transition: transform 0.3s ease; 
+        }
+        #creator .creator-img:hover { transform: scale(1.05); }
+        #monitoring-table { padding: 60px 20px; }
+        #monitoring-table #status { 
+            font-size: 36px; 
+            font-weight: 600; 
+            margin: 30px 0; 
+            transition: all 0.3s ease; 
+        }
+        #monitoring-table #status.active { transform: scale(1.02); }
+        .idle { color: #6e6e73; }
+        .Normal_Operation { color: #34c759; }
+        .Imbalance { color: #007aff; }
+        .anomaly { color: #ff3b30; }
+        .dashboard-card { 
+            background: #fff; 
+            border-radius: 16px; 
+            padding: 20px; 
+            max-width: 500px; 
+            margin: 20px auto; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+            text-align: left; 
+        }
+        .dashboard-card p { 
+            font-size: 16px; 
+            margin: 10px 0; 
+            color: #1d1d1f; 
+        }
+        .dashboard-card p strong { color: #1d1d1f; }
+        .button-group { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            margin-bottom: 30px; 
+        }
+        button { 
+            background: #007aff; 
+            color: #fff; 
+            border: none; 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            font-weight: 500; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        button:disabled { background: #d1d1d6; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #005bb5; transform: translateY(-2px); }
+        #disconnectButton { background: #ff3b30; display: none; }
+        #disconnectButton:hover { background: #d32f2f; }
+        #control-panel { padding: 60px 20px; }
+        .control-buttons { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; /* Align container left */
+            gap: 20px; 
+            width: 700px; /* Fixed width for alignment */
+            text-align: left; /* Ensure text aligns left */
+            padding-left:320px; /* Add this line */
+        }
+        .control-button { 
+            background: #fff; 
+            border: 1px solid #d1d1d6; 
+            padding: 20px 30px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            font-size: 18px; 
+            font-weight: 500; 
+            color: #1d1d1f; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            width: 100%; 
+            justify-content: flex-start; 
+        }
+        .control-button img { width: 28px; height: 28px; }
+        .control-button:hover { 
+            background: #e5e5ea; 
+            transform: translateY(-2px); 
+            border-color: #007aff; 
+        }
+        #log-modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.5); 
+            z-index: 100; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #log-modal.visible { display: flex; }
+        #log-content { 
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 16px; 
+            width: 90%; 
+            max-width: 550px; 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); 
+        }
+        #log-content h3 { font-size: 22px; font-weight: 600; margin-bottom: 15px; }
+        #log { 
+            max-height: 250px; 
+            overflow-y: auto; 
+            font-size: 14px; 
+            color: #1d1d1f; 
+            padding: 10px; 
+            background: #f5f5f7; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+        }
+        #close-log { background: #ff3b30; padding: 8px 16px; }
+        #close-log:hover { background: #d32f2f; }
+        #downloadLogButton { background: #34c759; }
+        #downloadLogButton:hover { background: #2ea043; }
+        #how-it-works ul, #components ul { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            font-size: 17px; 
+            color: #6e6e73; 
+            list-style: none; 
+            text-align: left; 
+        }
+        #how-it-works ul li, #components ul li { margin-bottom: 20px; }
+        #how-it-works ul li strong, #components ul li strong { color: #1d1d1f; }
+        #components ul li::before { content: "• "; color: #007aff; }
+        .setup-image { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 12px; 
+            margin-top: 40px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        #condition_monitoring_trainer ul li::before { content: "• "; color: #007aff; }
+        .setup-image { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 12px; 
+            margin-top: 40px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        .methodology-image { 
+            max-width: 650px; 
+            height: auto; 
+            border-radius: 12px; 
+            margin-top: 40px; 
+            /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  */
+        }
+        .intro-image { 
+             max-width: 100%; 
+             width: 600px; /* Set your desired width */
+              height: auto; /* Set your desired height */
+              border-radius: 12px; 
+              margin-top: 40px; 
+}
+        .setup-label { 
+            font-size: 16px; 
+            color: #6e6e73; 
+            margin-top: 10px; 
+        }
+        @media (max-width: 768px) {
+            header { padding: 80px 15px 60px; min-height: 350px; }
+            header h1 { font-size: 48px; }
+            header p { font-size: 18px; }
+            .section { padding: 60px 15px; margin: 20px auto; } /* Smaller margin on mobile */
+            .section h2 { font-size: 32px; }
+            #monitoring-table #status { font-size: 28px; }
+            button { padding: 10px 20px; font-size: 14px; }
+            .dashboard-card { width: 100%; }
+            .logo { width: 60px; height: 60px; }
+            .control-button { padding: 15px 20px; font-size: 16px; }
+            .control-button img { width: 24px; height: 24px; }
+            .control-buttons { width: 100%; max-width: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- <img class="logo" src="https://media.licdn.com/dms/image/v2/C4D0BAQHbS3n7KaLTVA/company-logo_200_200/company-logo_200_200/0/1661349060933/pccegoaofficialpage_logo?e=1749686400&v=beta&t=oa_Uly18UlymVaIfI9b4t1Ty5WBBqXAVNqP4apFFfZpDwUZE" alt="PCCEGOA Logo"> -->
+        <h1>Vibration Monitor</h1>
+        <p>Predictive Maintenance with Cutting-Edge Technology</p>
+    </header>
+    <nav>
+        <a href="#project-intro">Project</a>
+        <a href="#creator">Team</a>
+        <a href="#monitoring-table">Monitor</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#components">Components</a>
+        <!-- <a href="#condition_monitoring_trainer">Condition Monitoring Trainer</a> -->
+    </nav>
+
+    <div id="project-intro" class="section">
+        <h2>Project Introduction</h2>
+        <p>
+            The Vibration Monitor project leverages recent advancements in TinyML to deliver an innovative, cost-effective solution for predictive maintenance through advanced vibration analysis. Unlike traditional condition monitoring systems that rely on expensive external sensors, this project utilizes the onboard Inertial Measurement Unit (IMU) of the Arduino Nano 33 BLE Sense, enabling direct and efficient vibration analysis. </p> 
+            <img src="intro_img.png" alt="Project Introduction Image" class="intro-image">
+            <div class="setup-label">Project Overview</div>
+            <p></p>
+            <p>By harnessing accelerometer and gyroscope data, a machine learning model was developed and trained on the Edge Impulse platform to classify operational states into "normal," "abnormal," and "idle" categories, achieving an impressive accuracy of 99%. The model employs a 1D Convolutional Neural Network (CNN) architecture, optimized for low-power, real-time inference on resource-constrained devices. Integrated with Bluetooth Low Energy (BLE), the system transmits predictions to a user-friendly dashboard, facilitating proactive maintenance decisions to minimize downtime, enhance machinery reliability, and reduce operational costs.</p> <p> The next phase of development focuses on expanding the model’s capabilities to include multifault recognition including faults of shaft mis-alignment, bearing fault, imbalance and mechanical joint faults, enabling the identification and classification of multiple fault types for even more comprehensive predictive maintenance.</p>
+        </p>
+    </div>
+
+    <div id="creator" class="section">
+        <h2>Team</h2>
+        <img src="team.jpg" alt="Team Photo" class="creator-img">
+        <div class="bio">
+            <h3>Team members consist of:</h3>
+            <ul>
+                <li>Leander D. Fernandes <strong>21MC24</strong></li>
+                <li>Meolson Coutinho     <strong>    21MC28</strong></li>
+                <li>Clayde Estrocio      <strong>    21MC10</strong></li>
+                <li>Marlon Borges        <strong>    21MC26</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="monitoring-table" class="section">
+        <h2>Monitoring Dashboard</h2>
+        <div class="button-group">
+            <button id="connectButton">Connect</button>
+            <button id="disconnectButton" style="display: none;">Disconnect</button>
+            <button id="log-toggle">View Log</button>
+        </div>
+        <div id="status">Status: Disconnected</div>
+        <div class="dashboard-card">
+            <p><strong>Prediction:</strong> <span id="predictionLabel">No data yet</span></p>
+            <p><strong>Confidence:</strong> <span id="predictionConfidence">N/A</span></p>
+        </div>
+    </div>
+
+    <div id="control-panel" class="section">
+        <h2>Control Panel</h2>
+        <div class="control-buttons">
+            <button class="control-button" id="powerOnButton">
+                <img src="https://w7.pngwing.com/pngs/523/806/png-transparent-button-toggle-on-off-switch-green-glossy-start-power-control-thumbnail.png" alt="Power On Icon"> Power On
+            </button>
+            <button class="control-button" id="powerOffButton">
+                <img src="https://w7.pngwing.com/pngs/403/85/png-transparent-switch-stop-red-power-toggle-off-red-power-red-stop-thumbnail.png" alt="Power Off Icon"> Power Off
+            </button>
+        </div>
+    </div>
+
+    <div id="log-modal">
+        <div id="log-content">
+            <h3>Prediction Log</h3>
+            <div id="log"></div>
+            <button id="downloadLogButton">Download</button>
+            <button id="close-log">Close</button>
+        </div>
+    </div>
+
+    <div id="how-it-works" class="section">
+        <h2>How It Works</h2>
+        <ul>
+            <li><strong>Data Accquisition:</strong> Arduino sketch and pyserial library in python write 2 second accelerometer & gyroscopic data sampled at 400HZ into csv files. Datasets for Normal, Abnorml & Idle are collected. </li>
+            <li><strong>Model Training:</strong> The datasets are uploaded to EdgeImpulse as timeseries data. A spectral feature block is used to preprocess the data and extract frequency based information. These features are used to train a classification model to predict states of <b>Normal, Abnormal & Idle</b></li>
+            <li><strong>Deployment:</strong> Once the model is trained it is deployed back to the board as an Arduino library. Now the sensor data is used for real time inferencing. Thus a prediction of <b>Normal, Abnormal & Idle</b> along with <b>prediction confidence</b> is written into the serial monitor. </li>
+            <li><strong>GUI Dashboard:</strong>The BLE module on the Arduino Nano BLE 33 is used to trasnmit the Prediction & Prediction confidence and via custom UUIDS, the values are displayed onto a locally running HTML dashboard. Thus seamless monitoring of system via vibration analysis is obtained.</li>
+        </ul>
+        <img src="Methodology.png" alt="Methodology Diagram" class="methodology-image">
+        <div class="setup-label">Methodology Diagram</div>
+    </div>
+
+    <div id="components" class="section">
+        <h2>Simple Setup Components</h2>
+        <ul>
+            <li>3D Printed Base</li>
+            <li>Arduino Nano BLE 33</li>
+            <li>9V Battery</li>
+            <li>DC Motor</li>
+            <li>3D Printed Fans (Normal and Faulty)</li>
+        </ul>
+        <img src="setup.png" alt="Setup" class="setup-image">
+            <br></br>
+        <div class="setup-label">Setup 1</div>
+    
+    </div>
+
+     <div id="components" class="section">
+        <h2>Condition Monitoring Trainer </h2>
+        <ul>
+            <li>Aluminium flange</li>
+            <li>Chromium flange</li>
+            <li>Pulley</li>
+            <li>AC Motor</li>
+            <li>3Aluminium Discs</li>
+        </ul>
+        <img src="Setup2.png" alt="Setup" class="setup-image">
+        <div class="setup-label">Setup 2</div>
+    
+    </div>
+
+    <script>
+        let device;
+        let characteristic;
+        const serviceUuid = "0000180c-0000-1000-8000-00805f9b34fb".toLowerCase();
+        const characteristicUuid = "00002a56-0000-1000-8000-00805f9b34fb".toLowerCase();
+        let latestPrediction = { label: "Idle", value: 0 };
+        let logEntries = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const connectButton = document.getElementById('connectButton');
+            const disconnectButton = document.getElementById('disconnectButton');
+            const powerOnButton = document.getElementById('powerOnButton');
+            const powerOffButton = document.getElementById('powerOffButton');
+            const statusElement = document.getElementById('status');
+            const logElement = document.getElementById('log');
+            const logToggle = document.getElementById('log-toggle');
+            const logModal = document.getElementById('log-modal');
+            const closeLog = document.getElementById('close-log');
+            const downloadLogButton = document.getElementById('downloadLogButton');
+            const predictionLabel = document.getElementById('predictionLabel');
+            const predictionConfidence = document.getElementById('predictionConfidence');
+
+            connectButton.addEventListener('click', async () => {
+                console.log("Connect button clicked - Initiating BLE connection");
+                try {
+                    connectButton.disabled = true;
+                    statusElement.textContent = 'Status: Requesting device...';
+                    statusElement.className = ''; // Reset classes
+                    statusElement.classList.add('active');
+
+                    device = await navigator.bluetooth.requestDevice({
+                        filters: [{ name: 'VibrationPredictor' }],
+                        optionalServices: [serviceUuid]
+                    });
+                    console.log("Device selected:", device.name, "ID:", device.id);
+                    device.addEventListener('gattserverdisconnected', onDisconnected);
+
+                    statusElement.textContent = 'Status: Connecting to GATT...';
+                    const server = await device.gatt.connect();
+                    console.log("GATT connected, connected state:", device.gatt.connected);
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    statusElement.textContent = 'Status: Getting service...';
+                    const service = await retryOperation(() => server.getPrimaryService(serviceUuid), 3, 1000);
+                    console.log("Service found:", serviceUuid);
+
+                    statusElement.textContent = 'Status: Getting characteristic...';
+                    characteristic = await service.getCharacteristic(characteristicUuid);
+                    console.log("Characteristic found:", characteristicUuid);
+
+                    statusElement.textContent = 'Status: Starting notifications...';
+                    await characteristic.startNotifications();
+                    characteristic.addEventListener('characteristicvaluechanged', handleData);
+                    console.log('Notifications started');
+
+                    statusElement.textContent = 'Status: Connected';
+                    connectButton.style.display = 'none';
+                    disconnectButton.style.display = 'inline-block';
+                } catch (error) {
+                    console.error('Connection failed:', error.message);
+                    statusElement.textContent = `Status: Disconnected (Error: ${error.message})`;
+                    statusElement.className = ''; // Reset classes
+                    connectButton.disabled = false;
+                    connectButton.style.display = 'inline-block';
+                    disconnectButton.style.display = 'none';
+                    device = null;
+                }
+            });
+
+            disconnectButton.addEventListener('click', async () => {
+                console.log("Disconnect button clicked");
+                if (device && device.gatt.connected) {
+                    await characteristic.stopNotifications();
+                    characteristic.removeEventListener('characteristicvaluechanged', handleData);
+                    await device.gatt.disconnect();
+                    statusElement.textContent = 'Status: Disconnected';
+                    statusElement.className = ''; // Reset classes
+                    connectButton.style.display = 'inline-block';
+                    disconnectButton.style.display = 'none';
+                    connectButton.disabled = false;
+                    predictionLabel.textContent = 'No data yet';
+                    predictionConfidence.textContent = 'N/A';
+                    device = null;
+                }
+            });
+
+            powerOnButton.addEventListener('click', () => {
+                console.log("Power On button clicked (presentation only)");
+            });
+
+            powerOffButton.addEventListener('click', () => {
+                console.log("Power Off button clicked (presentation only)");
+            });
+
+            logToggle.addEventListener('click', () => {
+                logModal.classList.add('visible');
+            });
+
+            closeLog.addEventListener('click', () => {
+                logModal.classList.remove('visible');
+            });
+
+            logModal.addEventListener('click', (e) => {
+                if (e.target === logModal) {
+                    logModal.classList.remove('visible');
+                }
+            });
+
+            downloadLogButton.addEventListener('click', () => {
+                const logText = logEntries.join('\n');
+                const blob = new Blob([logText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vibration_log_${new Date().toISOString().split('T')[0]}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            async function retryOperation(operation, maxAttempts, delayMs) {
+                for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                    try {
+                        console.log(`Attempt ${attempt} to execute operation`);
+                        return await operation();
+                    } catch (error) {
+                        console.warn(`Attempt ${attempt} failed: ${error.message}`);
+                        if (attempt === maxAttempts) throw error;
+                        if (!device.gatt.connected) {
+                            console.log("GATT disconnected, reconnecting...");
+                            await device.gatt.connect();
+                            console.log("Reconnected, connected state:", device.gatt.connected);
+                        }
+                        await new Promise(resolve => setTimeout(resolve, delayMs));
+                    }
+                }
+            }
+
+            function onDisconnected(event) {
+                console.log("GATT server disconnected");
+                statusElement.textContent = 'Status: Disconnected (GATT dropped)';
+                statusElement.className = ''; // Reset classes
+                connectButton.style.display = 'inline-block';
+                disconnectButton.style.display = 'none';
+                connectButton.disabled = false;
+                predictionLabel.textContent = 'No data yet';
+                predictionConfidence.textContent = 'N/A';
+            }
+
+            function handleData(event) {
+                const value = new TextDecoder().decode(event.target.value);
+                console.log('Received:', value);
+                updateDisplay(value);
+                updateLog(value);
+            }
+
+            function updateDisplay(data) {
+                const [label, value] = data.split(':').map(part => part.trim());
+                latestPrediction.label = label;
+                latestPrediction.value = parseFloat(value);
+
+                predictionLabel.textContent = latestPrediction.label;
+                predictionConfidence.textContent = latestPrediction.value.toFixed(5);
+
+                statusElement.className = ''; // Clear previous classes
+                statusElement.classList.add('active');
+
+                if (latestPrediction.label === "Idle State") {
+                    statusElement.textContent = 'Status: Idle State';
+                    statusElement.classList.add('idle');
+                } else if (latestPrediction.label === "Normal Operation") {
+                    statusElement.textContent = 'Status: Normal Operation';
+                    statusElement.classList.add('Normal_Operation');
+                } else if (latestPrediction.label === "Imbalance") {
+                    statusElement.textContent = 'Status: Imbalance Detected';
+                    statusElement.classList.add('Imbalance');
+                } else if (latestPrediction.label === "Anomaly") {
+                    statusElement.textContent = 'Status: Anomaly Detected';
+                    statusElement.classList.add('anomaly');
+                } else {
+                    statusElement.textContent = `Status: ${latestPrediction.label}`;
+                    statusElement.classList.add('idle');
+                }
+
+                setTimeout(() => statusElement.classList.remove('active'), 500);
+            }
+
+            function updateLog(data) {
+                const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
+                const logEntry = `${timestamp} - ${data}`;
+                logEntries.push(logEntry);
+                logElement.innerHTML = logEntries.map(entry => `<div>${entry}</div>`).join('');
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        });
+
+        window.onbeforeunload = () => {
+            if (device && device.gatt.connected) {
+                device.gatt.disconnect();
+            }
+        };
+    </script>
+</body>
+</html>
