@@ -16,7 +16,7 @@
         }
         p, ul { text-align: justify; }
         header { 
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)), url('Header.png') no-repeat center center; 
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)), url('assets/Header.png') no-repeat center center; 
             background-size: cover; 
             min-height: 180px; 
             color: #fff; 
@@ -324,7 +324,7 @@
         <h2>Project Introduction</h2>
         <p>
             The Vibration Monitor project leverages recent advancements in TinyML to deliver an innovative, cost-effective solution for predictive maintenance through advanced vibration analysis. Unlike traditional condition monitoring systems that rely on expensive external sensors, this project utilizes the onboard Inertial Measurement Unit (IMU) of the Arduino Nano 33 BLE Sense, enabling direct and efficient vibration analysis. </p> 
-            <img src="intro_img.png" alt="Project Introduction Image" class="intro-image">
+            <img src="assets/intro_img.png" alt="Project Introduction Image" class="intro-image">
             <div class="setup-label">Project Overview</div>
             <p></p>
             <p>By harnessing accelerometer and gyroscope data, a machine learning model was developed and trained on the Edge Impulse platform to classify operational states into "normal," "abnormal," and "idle" categories, achieving an impressive accuracy of 99%. The model employs a 1D Convolutional Neural Network (CNN) architecture, optimized for low-power, real-time inference on resource-constrained devices. Integrated with Bluetooth Low Energy (BLE), the system transmits predictions to a user-friendly dashboard, facilitating proactive maintenance decisions to minimize downtime, enhance machinery reliability, and reduce operational costs.</p> <p> The next phase of development focuses on expanding the model’s capabilities to include multifault recognition including faults of shaft mis-alignment, bearing fault, imbalance and mechanical joint faults, enabling the identification and classification of multiple fault types for even more comprehensive predictive maintenance.</p>
@@ -388,7 +388,7 @@
             <li><strong>Deployment:</strong> Once the model is trained it is deployed back to the board as an Arduino library. Now the sensor data is used for real time inferencing. Thus a prediction of <b>Normal, Abnormal & Idle</b> along with <b>prediction confidence</b> is written into the serial monitor. </li>
             <li><strong>GUI Dashboard:</strong>The BLE module on the Arduino Nano BLE 33 is used to trasnmit the Prediction & Prediction confidence and via custom UUIDS, the values are displayed onto a locally running HTML dashboard. Thus seamless monitoring of system via vibration analysis is obtained.</li>
         </ul>
-        <img src="Methodology.png" alt="Methodology Diagram" class="methodology-image">
+        <img src="assets/Methodology.png" alt="Methodology Diagram" class="methodology-image">
         <div class="setup-label">Methodology Diagram</div>
     </div>
 
@@ -401,7 +401,7 @@
             <li>DC Motor</li>
             <li>3D Printed Fans (Normal and Faulty)</li>
         </ul>
-        <img src="setup.png" alt="Setup" class="setup-image">
+        <img src="assets/setup.png" alt="Setup" class="setup-image">
             <br></br>
         <div class="setup-label">Setup 1</div>
     
